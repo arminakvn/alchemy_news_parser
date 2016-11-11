@@ -36,15 +36,20 @@ class AlchemyNewsParser(object):
 
 	def checkNext(self,results):
 		self.application_state.update({"task_log": "checking results.next to see if empty"})
-		if results["result"]["next"] != '':
-			self.application_state.update({"task_log": "results.next is not empty"})
-			print self.application_state
-			self.next = results["result"]["next"]
-		else:
-			self.application_state.update({"task_log": "setting self.next to None before break"})
-			print self.application_state
+		try:
+
+			if results["result"]["next"] != '' and results["result"]["next"] != self.next:
+				self.application_state.update({"task_log": "results.next is not empty"})
+				print self.application_state
+				self.next = results["result"]["next"]
+			else:
+				self.application_state.update({"task_log": "setting self.next to None before break"})
+				print self.application_state
+				self.next = 'None'
+				self.still_more = False
+				return "break"
+		except:
 			self.next = 'None'
-			self.still_more = False
 			return "break"
 	
 	def getNews(self):
