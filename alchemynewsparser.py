@@ -109,8 +109,8 @@ class AlchemyNewsParser(object):
 					self.application_state.update({"task_log": "try with a next-- call failed"})
 					print self.application_state
 					print watson_developer_cloud_service.WatsonException
-					self.still_more = False
-					break
+					# self.still_more = False
+					# break
 					# self.results = results
 			
 			# except:
