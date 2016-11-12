@@ -14,7 +14,22 @@ class AlchemyNewsParser(object):
 		self.alchemy_data_news = AlchemyDataNewsV1(api_key=self.arg["key"])
 		self.news_doc_responds = list()
 		self.next = 'None'
+		self.url_base_url = "https://access.alchemyapi.com/calls/data/GetNews?"
+		self.url_key = "apikey="
+		self.url_returns = "&return="
+		self.retrun_fields_default = "enriched.url.title,enriched.url.url,enriched.url.enrichedTitle.entities,enriched.url.enrichedTitle.docSentiment,enriched.url.enrichedTitle.concepts"
+		self.url_start_date = "&start="
+		self.url_end_date = "&end="
+		self.url_q_field = "&q."
+		self.q_field_default = "enriched.url.cleanedTitle="
+		self.url_count = "&count="
+		self.url_outputMode = "&outputMode=json"
 
+	def urlMaker(self):
+		"""alternatively, use requests library to call the api directly and 
+		without using the watson cloud developers library"""
+		self.made_url = "{0}{1}{2}{3}{4}{5}{6}{7}{8}{9}{10}{11}{12}".format(self.url_base_url, self.url_key,self.arg["key"],self.url_returns,self.retrun_fields_default,self.url_start_date,self.start,self.url_end_date,self.end,self.url_q_field,self.q_field_default,self.text_for_query,self.url_outputMode)
+		# print self.made_url
 	def fromDateOf(self, start_date):
 		self.start="%s" % (start_date)
 
@@ -35,7 +50,6 @@ class AlchemyNewsParser(object):
 			json.dump(doc_resp,fw)
 			fw.write("\n")
 			fw.flush()
-			# self.news_doc_responds.append(doc_resp)
 
 	def checkNext(self,results):
 		self.application_state.update({"task_log": "checking results.next to see if empty"})
@@ -67,8 +81,6 @@ class AlchemyNewsParser(object):
 		
 		while self.still_more:
 			time.sleep(9)
-			# page_number += 1
-			# try:
 			print "self.next", self.next
 			if (self.next == 'None') and (self.next != "Done"):
 				try:
@@ -87,11 +99,6 @@ class AlchemyNewsParser(object):
 					checkBreak = self.checkNext(results)
 					if checkBreak == "break":
 						break
-					# return results
-
-
-
-
 				except watson_developer_cloud_service.WatsonException:
 					self.application_state.update({"task_log": "First call try failed"})
 					print self.application_state
@@ -111,7 +118,6 @@ class AlchemyNewsParser(object):
 						query_fields={"enriched.url.title={0}".format(self.text_for_query)},
 						next_page=self.next)
 					self.application_state["call_count"] += 1
-					# return results
 					self.checkStatusAndSave(results, fw)
 					self.checkNext(results)
 
@@ -119,14 +125,10 @@ class AlchemyNewsParser(object):
 					self.application_state.update({"task_log": "try with a next-- call failed"})
 					print self.application_state
 					print watson_developer_cloud_service.WatsonException
-					# self.still_more = False
-					# break
-					# self.results = results
 			else:
 				self.still_more = False
 				break
-			# except:
-			# 	pass
+
 	def printResults(self):
 		print(self.news_doc_responds)
 
