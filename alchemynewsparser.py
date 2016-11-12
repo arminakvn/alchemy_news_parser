@@ -25,20 +25,23 @@ class AlchemyNewsParser(object):
 		self.text_for_query = text_for_query
 	
 		
-	def checkStatusAndSave(self, results):
+	def checkStatusAndSave(self, results, fw):
 		doc_resp = dict()
 		print "checking status"
 		if results["status"] == "OK":
 			self.application_state.update({"task_log": "results status ok, saving ..."})
 			print self.application_state
 			doc_resp.update({'page_number': self.application_state["call_count"], 'result': results["result"]})
-			self.news_doc_responds.append(doc_resp)
+			json.dump(doc_resp,fw)
+			fw.write("\n")
+			fw.flush()
+			# self.news_doc_responds.append(doc_resp)
 
 	def checkNext(self,results):
 		self.application_state.update({"task_log": "checking results.next to see if empty"})
 		try:
 
-			if results["result"]["next"] != '' and results["result"]["next"] != self.next:
+			if results["result"]["next"] != '':
 				self.application_state.update({"task_log": "results.next is not empty"})
 				print self.application_state
 				self.next = results["result"]["next"]
@@ -49,10 +52,12 @@ class AlchemyNewsParser(object):
 				self.still_more = False
 				return "break"
 		except:
-			self.next = 'None'
+			self.next = 'Done'
+			self.application_state.update({"task_log": "Checking next failed -- setting to Done"})
+			print self.application_state
 			return "break"
 	
-	def getNews(self):
+	def getNews(self, fw):
 		page_number = 0
 		self.still_more = True
 		self.application_state.update({"task_log": "getNews method started"})
@@ -65,7 +70,7 @@ class AlchemyNewsParser(object):
 			# page_number += 1
 			# try:
 			print "self.next", self.next
-			if self.next == 'None':
+			if (self.next == 'None') and (self.next != "Done"):
 				try:
 					self.application_state.update({"task_log": "next is none, trying the first call"})
 					print self.application_state
@@ -76,10 +81,9 @@ class AlchemyNewsParser(object):
 										'enriched.url.url',
 										'enriched.url.author',
 										'enriched.url.publicationDate'],
-						query_fields={"enriched.url.title={0}".format(self.text_for_query)},
-						next_page=self.next)
+						query_fields={"enriched.url.title={0}".format(self.text_for_query)})
 					self.application_state["call_count"] += 1
-					self.checkStatusAndSave(results)
+					self.checkStatusAndSave(results, fw)
 					checkBreak = self.checkNext(results)
 					if checkBreak == "break":
 						break
@@ -92,7 +96,7 @@ class AlchemyNewsParser(object):
 					self.application_state.update({"task_log": "First call try failed"})
 					print self.application_state
 					print watson_developer_cloud_service.WatsonException
-			else:
+			elif self.next != "Done":
 				print "else of the check for next"
 				try:
 					self.application_state.update({"task_log": "try with a next-- before call"})
@@ -104,10 +108,11 @@ class AlchemyNewsParser(object):
 										'enriched.url.url',
 										'enriched.url.author',
 										'enriched.url.publicationDate'],
-						query_fields={"enriched.url.title={0}".format(self.text_for_query)})
+						query_fields={"enriched.url.title={0}".format(self.text_for_query)},
+						next_page=self.next)
 					self.application_state["call_count"] += 1
 					# return results
-					self.checkStatusAndSave(results)
+					self.checkStatusAndSave(results, fw)
 					self.checkNext(results)
 
 				except watson_developer_cloud_service.WatsonException:
@@ -117,7 +122,9 @@ class AlchemyNewsParser(object):
 					# self.still_more = False
 					# break
 					# self.results = results
-			
+			else:
+				self.still_more = False
+				break
 			# except:
 			# 	pass
 	def printResults(self):

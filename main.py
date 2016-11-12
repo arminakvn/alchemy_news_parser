@@ -13,7 +13,9 @@ if __name__ == '__main__':
 	parser.toDateOf(1478711895)
 	
 	parser.queryFor("shooting")
+	fw=open('news.dat','a')
+	parser.getNews(fw)
 	
-	parser.getNews()
 	
 	parser.printResults()
+	fw.close()
