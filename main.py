@@ -1,20 +1,43 @@
+import sys, getopt
 from alchemynewsparser import *
 
+def main(argv):
+	fromDate = 1478304000
+	toDate = 1478991600
+	query = "shooting"
+	output = 'news.dat'
+	api_key = "YOUR_API_KEY"
+	try:
+		opts, args = getopt.getopt(argv,"hf:t:q:a:o:",["fromdate=","todate=", "querytext=", "apikey=", "output="])
+	except getopt.GetoptError:
+		print 'get_news.py -f <fromdate> -t <todate> -q <querytext> -a <apikey> -o <output>'
 
+	for opt, arg in opts:
+		if opt == '-h':
+			print 'get_news.py -f <fromdate> -t <todate> -q <querytext> -a <apikey> -o <output>' 
+			sys.exit()
+		elif opt in ("-f", "--fromdate"):
+			fromDate = arg
+		elif opt in ("-t", "--todate"):
+			fromDate = arg
+		elif opt in ("-q", "--querytext"):
+			query = arg
+		elif opt in ("-a", "--apikey"):
+			api_key = arg
+		elif opt in ("-o", "--output"):
+			output = arg
 
-if __name__ == '__main__':
-
-
-	parser = AlchemyNewsParser({'key':"01c353b6015cd13b7685b7c0c42feea3686df75c"})
-
-	# parser.fromDateOf(1473441494)
-	parser.fromDateOf(1478304000)
-	
-	parser.toDateOf(1478991600)
-	
-	parser.queryFor("shooting")
-	fw=open('news.dat','a')
-	parser.urlMaker()
+	if api_key == "YOUR_API_KEY":
+		print "Either enter you Watson News API Key as arguemnt with -a or edit in the main.py. Run main.py -h to see available options."
+		sys.exit()
+	parser = AlchemyNewsParser({'key':api_key})
+	parser.fromDateOf(fromDate)
+	parser.toDateOf(toDate)
+	parser.queryFor(query)
+	fw=open(output,'a')
 	parser.getNews(fw)
 	parser.printResults()
 	fw.close()
+
+if __name__ == '__main__':
+	main(sys.argv[1:])
