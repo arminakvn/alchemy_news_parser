@@ -25,11 +25,15 @@ class AlchemyNewsParser(object):
 		self.url_count = "&count="
 		self.url_outputMode = "&outputMode=json"
 
-	def urlMaker(self):
+	
 		"""alternatively, use requests library to call the api directly and 
 		without using the watson cloud developers library"""
+	def urlMaker(self):
 		self.made_url = "{0}{1}{2}{3}{4}{5}{6}{7}{8}{9}{10}{11}{12}".format(self.url_base_url, self.url_key,self.arg["key"],self.url_returns,self.retrun_fields_default,self.url_start_date,self.start,self.url_end_date,self.end,self.url_q_field,self.q_field_default,self.text_for_query,self.url_outputMode)
 		# print self.made_url
+	def urlMakerWithNext(self):
+		self.made_url = "{0}{1}{2}{3}{4}{5}{6}{7}{8}{9}{10}{11}{12}{13}{14}".format(self.url_base_url, self.url_key,self.arg["key"],self.url_returns,self.retrun_fields_default,self.url_start_date,self.start,self.url_end_date,self.end,self.url_q_field,self.q_field_default,self.text_for_query,"&next=", self.next,self.url_outputMode)
+
 	def fromDateOf(self, start_date):
 		self.start="%s" % (start_date)
 
@@ -92,8 +96,13 @@ class AlchemyNewsParser(object):
 						return_fields=['enriched.url.title',
 										'enriched.url.url',
 										'enriched.url.author',
-										'enriched.url.publicationDate'],
-						query_fields={"enriched.url.title={0}".format(self.text_for_query)})
+										'enriched.url.publicationDate',
+										'enriched.url.enrichedTitle.entities',
+										'enriched.url.enrichedTitle.docSentiment',
+										'enriched.url.enrichedTitle.concepts',
+										'enriched.url.enrichedTitle.taxonomy',
+										'enriched.url.title'],
+						query_fields={'q.enriched.url.enrichedTitle.entities.entity': '|text={0}|'.format(self.text_for_query)})
 					self.application_state["call_count"] += 1
 					self.checkStatusAndSave(results, fw)
 					checkBreak = self.checkNext(results)
@@ -114,8 +123,13 @@ class AlchemyNewsParser(object):
 						return_fields=['enriched.url.title',
 										'enriched.url.url',
 										'enriched.url.author',
-										'enriched.url.publicationDate'],
-						query_fields={"enriched.url.title={0}".format(self.text_for_query)},
+										'enriched.url.publicationDate',
+										'enriched.url.enrichedTitle.entities',
+										'enriched.url.enrichedTitle.docSentiment',
+										'enriched.url.enrichedTitle.concepts',
+										'enriched.url.enrichedTitle.taxonomy',
+										'enriched.url.title'],
+						query_fields={'q.enriched.url.enrichedTitle.entities.entity': '|text={0}|'.format(self.text_for_query)},
 						next_page=self.next)
 					self.application_state["call_count"] += 1
 					self.checkStatusAndSave(results, fw)
