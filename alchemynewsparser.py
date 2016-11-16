@@ -25,8 +25,8 @@ class AlchemyNewsParser(object):
 		self.url_count = "&count="
 		self.url_outputMode = "&outputMode=json"
 
-	
-		"""alternatively, use requests library to call the api directly and 
+
+		"""alternatively, use requests library to call the api directly and
 		without using the watson cloud developers library"""
 	def urlMaker(self):
 		self.made_url = "{0}{1}{2}{3}{4}{5}{6}{7}{8}{9}{10}{11}{12}".format(self.url_base_url, self.url_key,self.arg["key"],self.url_returns,self.retrun_fields_default,self.url_start_date,self.start,self.url_end_date,self.end,self.url_q_field,self.q_field_default,self.text_for_query,self.url_outputMode)
@@ -39,11 +39,11 @@ class AlchemyNewsParser(object):
 
 	def toDateOf(self, end_date):
 		self.end="%s" % (end_date)
-	
+
 	def queryFor(self, text_for_query):
 		self.text_for_query = text_for_query
-	
-		
+
+
 	def checkStatusAndSave(self, results, fw):
 		doc_resp = dict()
 		print "checking status"
@@ -51,9 +51,9 @@ class AlchemyNewsParser(object):
 			self.application_state.update({"task_log": "results status ok, saving ..."})
 			print self.application_state
 			doc_resp.update({'page_number': self.application_state["call_count"], 'result': results["result"]})
-			json.dump(doc_resp,fw)
-			fw.write("\n")
-			fw.flush()
+			json.dump(doc_resp,fw, indent=2)
+			# fw.write("\n")
+			# fw.flush()
 
 	def checkNext(self,results):
 		self.application_state.update({"task_log": "checking results.next to see if empty"})
@@ -74,7 +74,7 @@ class AlchemyNewsParser(object):
 			self.application_state.update({"task_log": "Checking next failed -- setting to Done"})
 			print self.application_state
 			return "break"
-	
+
 	def getNews(self, fw):
 		page_number = 0
 		self.still_more = True
@@ -82,7 +82,7 @@ class AlchemyNewsParser(object):
 
 		print self.application_state
 
-		
+
 		while self.still_more:
 			time.sleep(9)
 			print "self.next", self.next
@@ -145,7 +145,3 @@ class AlchemyNewsParser(object):
 
 	def printResults(self):
 		print(self.news_doc_responds)
-
-
-
-

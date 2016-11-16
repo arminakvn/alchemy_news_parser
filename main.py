@@ -14,7 +14,7 @@ def main(argv):
 
 	for opt, arg in opts:
 		if opt == '-h':
-			print 'get_news.py -f <fromdate> -t <todate> -q <querytext> -a <apikey> -o <output>' 
+			print 'get_news.py -f <fromdate> -t <todate> -q <querytext> -a <apikey> -o <output>'
 			sys.exit()
 		elif opt in ("-f", "--fromdate"):
 			fromDate = arg
@@ -34,10 +34,10 @@ def main(argv):
 	parser.fromDateOf(fromDate)
 	parser.toDateOf(toDate)
 	parser.queryFor(query)
-	fw=open(output,'a')
-	parser.getNews(fw)
-	parser.printResults()
-	fw.close()
+	with open(output, "w") as fw:
+		parser.getNews(fw)
+		# parser.printResults()
+	# fw.close()
 
 if __name__ == '__main__':
 	main(sys.argv[1:])
