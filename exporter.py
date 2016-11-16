@@ -34,8 +34,9 @@ def main(argv):
 	parser.fromDateOf(fromDate)
 	parser.toDateOf(toDate)
 	parser.queryFor(query)
-	parser.convertToJson("news.json","export.json")
-	with open(output, "w") as fw:
-		parser.getNews(fw)
+
+### the convertor is literally using the same class.... just running the conversion part
+## you can change the name of files you want to convert etc. here
+	parser.convertToJson("news.dat","export.json")
 if __name__ == '__main__':
 	main(sys.argv[1:])

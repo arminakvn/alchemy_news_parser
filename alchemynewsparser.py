@@ -143,5 +143,14 @@ class AlchemyNewsParser(object):
 				self.still_more = False
 				break
 
-	def printResults(self):
-		print(self.news_doc_responds)
+	def convertToJson(self, readfile, tofilename):
+		f = open(readfile, 'r')
+		with open(tofilename, 'a') as toconv:
+			for line in f:
+				l = line.split("\n")
+				for e in l:
+					try:
+						loadd = json.loads(e)
+						json.dump(loadd, toconv, indent=2)
+					except:
+						pass
